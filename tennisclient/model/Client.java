@@ -10,10 +10,15 @@ public class Client {
 	private DataInputStream input;
 	private DataOutputStream output;
 	private Thread outputThread;
+	private String address;
+
+	public Client(String adr) {
+		address = adr;
+	}
 
 	public void start() {
 		try {
-			connection = new Socket(InetAddress.getByName( "127.0.0.1" ), 5000 );
+			connection = new Socket(InetAddress.getByName(address), 5000 );
 			input = new DataInputStream(connection.getInputStream() );
 			output = new DataOutputStream(connection.getOutputStream() );
 		}

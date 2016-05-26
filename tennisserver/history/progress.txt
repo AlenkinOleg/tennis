@@ -1,7 +1,0 @@
-Start Game
-Score1: 0 Score2: 1
-Score1: 0 Score2: 2
-Score1: 0 Score2: 3
-Score1: 0 Score2: 4
-Score1: 0 Score2: 5
-Game Over

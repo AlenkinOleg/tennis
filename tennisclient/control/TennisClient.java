@@ -14,6 +14,7 @@ public class TennisClient extends JApplet implements Runnable {
 	private Client client;
 	private Thread outputThread;
 	private char mySide;
+	private String address;
 
 	JFrame myFrame;
     	MyPanel myPanel;
@@ -26,6 +27,11 @@ public class TennisClient extends JApplet implements Runnable {
 	int val;
 
 	boolean pad1=false, pad2=false;
+
+	public TennisClient(String adr) {
+		address = adr;
+		System.out.println(adr);
+	}
 	 
 	public void init()
 	{
@@ -51,7 +57,7 @@ public class TennisClient extends JApplet implements Runnable {
 	}
 	 
 	public void start() {
-		client = new Client();
+		client = new Client(address);
 		client.start();
 		outputThread = new Thread( this );
 		outputThread.start();
@@ -98,7 +104,7 @@ public class TennisClient extends JApplet implements Runnable {
 	}
 
 	public static void main(String[] args) {
-		TennisClient cl = new TennisClient();
+		TennisClient cl = new TennisClient(args[0]);
 		cl.init();
 		cl.start();
 	}

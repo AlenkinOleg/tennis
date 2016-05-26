@@ -14,6 +14,7 @@ public class TennisClient extends JApplet implements Runnable {
 	private Client client;
 	private Thread outputThread;
 	private char mySide;
+	private String address;
 
 	JFrame myFrame;
     	MyPanel myPanel;
@@ -26,6 +27,10 @@ public class TennisClient extends JApplet implements Runnable {
 	int val;
 
 	boolean pad1=false, pad2=false;
+
+	public TennisClient(String adr) {
+		address = adr;
+	}
 	 
 	public void init()
 	{
@@ -51,7 +56,7 @@ public class TennisClient extends JApplet implements Runnable {
 	}
 	 
 	public void start() {
-		client = new Client();
+		client = new Client(address);
 		client.start();
 		outputThread = new Thread( this );
 		outputThread.start();
@@ -62,20 +67,15 @@ public class TennisClient extends JApplet implements Runnable {
 		myPanel.setBias(mySide);
 
 		while ( true ) {
-			try {
-				myPanel.setOpponentY(client.readInt());
-				client.writeInt(myPanel.getMyY());
-				myPanel.setBallX(client.readInt());
-				myPanel.setBallY(client.readInt());
-				score1 = client.readInt();
-				score2 = client.readInt();
-				myPanel.repaint();
-				lb1.setText("Player 1 ="+ score1 +"");
-				lb2.setText("Player 2 ="+ score2 +"");
-			}
-			catch ( IOException e ) {
-				e.printStackTrace();
-			}
+			myPanel.setOpponentY(client.readInt());
+			client.writeInt(myPanel.getMyY());
+			myPanel.setBallX(client.readInt());
+			myPanel.setBallY(client.readInt());
+			score1 = client.readInt();
+			score2 = client.readInt();
+			myPanel.repaint();
+			lb1.setText("Player 1 ="+ score1 +"");
+			lb2.setText("Player 2 ="+ score2 +"");
 			if (score1 == 5 || score2 == 5)
 				break;
 		}
@@ -103,7 +103,7 @@ public class TennisClient extends JApplet implements Runnable {
 	}
 
 	public static void main(String[] args) {
-		TennisClient cl = new TennisClient();
+		TennisClient cl = new TennisClient(args[0]);
 		cl.init();
 		cl.start();
 	}
