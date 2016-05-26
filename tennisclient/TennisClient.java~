@@ -1,0 +1,179 @@
+package tennisclient;
+import java.awt.*;
+import java.awt.event.*;
+import java.net.*;
+import java.io.*;
+import javax.swing.*;
+ 
+public class TennisClient extends JApplet implements Runnable {
+	private JTextField id;
+	private JTextArea display;
+	private JPanel boardPanel, panel2;
+	private Socket connection;
+	private DataInputStream input;
+	private DataOutputStream output;
+	private Thread outputThread;
+	private char mySide;
+
+	JFrame myFrame;
+    	MyPanel myPanel;
+ 
+    	JLabel lb1, lb2;
+
+	int score1;
+	int score2;
+     
+	int val;
+
+	boolean pad1=false, pad2=false;
+	 
+	public void init()
+	{
+		myFrame = new JFrame();
+	     	myPanel = new MyPanel();
+
+		lb1 = new JLabel("Player1 = 0");
+		lb2 = new JLabel("Player2 = 0");
+
+		Container c = myFrame.getContentPane();
+		c.setLayout(new BorderLayout());
+
+		myPanel.add(lb1);
+		myPanel.add(lb2);
+		
+		c.add(myPanel);
+		
+		myFrame.setSize(500,500);
+		myFrame.setVisible(true);
+		myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		myFrame.addKeyListener(new KeyboradHandler());
+	}
+	 
+	public void start() {
+		try {
+			connection = new Socket(InetAddress.getByName( "127.0.0.1" ), 5000 );
+			input = new DataInputStream(connection.getInputStream() );
+			output = new DataOutputStream(connection.getOutputStream() );
+		}
+		catch ( IOException e ) {
+			e.printStackTrace();
+		}
+		outputThread = new Thread( this );
+		outputThread.start();
+	}
+
+	public void run() {
+		try {
+			mySide = input.readChar();
+		}
+		catch ( IOException e ) {
+			e.printStackTrace();
+		}
+
+		myPanel.setBias(mySide);
+
+		while ( true ) {
+			try {
+				myPanel.setOpponentY(input.readInt());
+				output.writeInt(myPanel.myY);
+				myPanel.setBallX(input.readInt());
+				myPanel.setBallY(input.readInt());
+				score1 = input.readInt();
+				score2 = input.readInt();
+				myPanel.repaint();
+				lb1.setText("Player 1 ="+ score1 +"");
+				lb2.setText("Player 2 ="+ score2 +"");
+			}
+			catch ( IOException e ) {
+				e.printStackTrace();
+			}
+			if (score1 == 5 || score2 == 5)
+				break;
+		}
+		if (score1 > score2)
+			lb1.setText("Player1 wins!!!");
+		else 
+			lb1.setText("Player2 wins!!!");
+		myPanel.remove(lb2);
+	}
+
+	public class KeyboradHandler extends KeyAdapter {	
+		public void keyPressed(KeyEvent ke) {		
+			if(ke.getKeyCode()==ke.VK_DOWN) {
+				if(myPanel.myY != 365) {
+					myPanel.myY += 5;			
+				}                 
+			}
+			
+			if(ke.getKeyCode()==ke.VK_UP) {
+				if(myPanel.myY != 0) {
+					myPanel.myY -= 5;			
+				}
+			}
+		}
+	}
+
+	public static void main(String[] args) {
+		TennisClient cl = new TennisClient();
+		cl.init();
+		cl.start();
+	}
+}
+
+class MyPanel extends JPanel {
+
+	int bx,by;
+	int myX,myY;
+	int myBias;
+	int opponentBias;
+	int opponentX,opponentY;
+
+	public MyPanel() {
+
+		bx=10;
+		by=200;
+		myX = 0;
+		myY = 180; 
+		opponentX = 0;
+		opponentY = 180;
+	}
+
+	public void paintComponent(Graphics g) {
+		
+		super.paintComponent(g);
+		
+		g.setColor(Color.GREEN);
+		g.fillOval(bx, by, 15, 15);
+
+		g.setColor(Color.BLACK);
+		g.fillRoundRect(myX + myBias, myY, 10, 100, 10, 10);
+		g.fillRoundRect(opponentX + opponentBias, opponentY, 10, 100, 10, 10);
+	}
+
+	public void setOpponentY(int y) {
+		opponentY = y;
+	}
+	
+	public void setBias(char indicator) {
+		if (indicator == 'L') {
+			myBias = 0;
+			opponentBias = getWidth()-20;
+			System.out.println("L\n");
+			System.out.println(getHeight());
+		}
+		else {
+			opponentBias = 0;
+			myBias = getWidth()-20;
+			System.out.println("R\n");
+		}
+	}
+
+	public void setBallX(int x) {
+		bx = x;
+	}
+	
+	public void setBallY(int y) {
+		by = y;
+	}
+}

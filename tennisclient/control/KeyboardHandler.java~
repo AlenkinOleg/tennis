@@ -1,0 +1,20 @@
+package tennisclient.control;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+public class KeyboradHandler extends KeyAdapter {	
+	public void keyPressed(KeyEvent ke) {		
+		if(ke.getKeyCode()==ke.VK_DOWN) {
+			if(myPanel.myY != 365) {
+				myPanel.myY += 5;			
+			}                 
+		}
+		
+		if(ke.getKeyCode()==ke.VK_UP) {
+			if(myPanel.myY != 0) {
+				myPanel.myY -= 5;			
+			}
+		}
+	}
+}
